@@ -1,199 +1,784 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Regras do Servidor | PonyBuild Brasil</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #0f0a1c;
-      background-image: 
-        radial-gradient(at 0% 0%, rgba(147, 51, 234, 0.15) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
-      background-attachment: fixed;
-    }
-    .font-pony {
-      font-family: 'Fredoka', cursive;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOTD // GMODLabs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,500;0,700;1,700&family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #07090e;
+            --bg-card: rgba(15, 20, 30, 0.85);
+            --physgun-cyan: #00e5ff;
+            --physgun-glow: rgba(0, 229, 255, 0.35);
+            --pvp-red: #ff2a4b;
+            --pvp-glow: rgba(255, 42, 75, 0.35);
+            --lab-amber: #ffae00;
+            --lab-glow: rgba(255, 174, 0, 0.3);
+            --allowed-green: #00ff88;
+            --text-main: #f0f4f8;
+            --text-muted: #94a3b8;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            /* Grade estilo gm_construct + vinheta */
+            background-image:
+                radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.12) 0%, transparent 60%),
+                radial-gradient(circle at 85% 30%, rgba(255, 174, 0, 0.08) 0%, transparent 50%),
+                linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+            min-height: 100vh;
+        }
+
+        /* Faixa de Risco / Isolamento no Topo */
+        .hazard-tape {
+            background: repeating-linear-gradient(
+                -45deg,
+                #ffae00,
+                #ffae00 18px,
+                #11151c 18px,
+                #11151c 36px
+            );
+            height: 10px;
+            width: 100%;
+            box-shadow: 0 2px 15px rgba(255, 174, 0, 0.4);
+        }
+
+        .status-bar {
+            background: rgba(255, 174, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 174, 0, 0.3);
+            padding: 8px 20px;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--lab-amber);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pulse-dot {
+            width: 9px;
+            height: 9px;
+            background-color: var(--lab-amber);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px var(--lab-amber);
+            animation: pulse 1.2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { opacity: 0.4; transform: scale(0.85); }
+            to { opacity: 1; transform: scale(1.2); }
+        }
+
+        .container {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 35px 20px 60px;
+        }
+
+        /* Cabeçalho Principal */
+        header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .badge-mode {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid var(--physgun-cyan);
+            color: var(--physgun-cyan);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 5px 14px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            box-shadow: 0 0 18px rgba(0, 229, 255, 0.2);
+        }
+
+        h1 {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            line-height: 1.05;
+            margin-bottom: 12px;
+            text-shadow: 0 0 25px rgba(0, 229, 255, 0.3);
+        }
+
+        h1 span.pvp {
+            color: var(--pvp-red);
+            text-shadow: 0 0 25px var(--pvp-glow);
+        }
+
+        h1 span.lab {
+            color: var(--lab-amber);
+            text-shadow: 0 0 25px var(--lab-glow);
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 680px;
+            margin: 0 auto 22px;
+        }
+
+        .ip-bar {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(15, 20, 30, 0.95);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 6px 6px 6px 16px;
+            gap: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+
+        .ip-text {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--physgun-cyan);
+            font-size: 0.9rem;
+        }
+
+        .btn-copy {
+            background: var(--physgun-cyan);
+            color: #04080f;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 7px;
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-copy:hover {
+            background: #fff;
+            box-shadow: 0 0 15px var(--physgun-cyan);
+            transform: translateY(-1px);
+        }
+
+        /* =========================================================
+           BANNER DE ALERTA EXPERIMENTAL + IMAGEM SEMI-TRANSPARENTE
+           ========================================================= */
+        .experiment-banner {
+            position: relative;
+            background: linear-gradient(135deg, rgba(255, 174, 0, 0.14) 0%, rgba(18, 22, 32, 0.95) 60%, rgba(255, 42, 75, 0.1) 100%);
+            border: 2px solid var(--lab-amber);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5), inset 0 0 25px rgba(255, 174, 0, 0.08);
+            display: grid;
+            grid-template-columns: 1.35fr 0.85fr;
+            gap: 25px;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .experiment-banner::before {
+            content: "PROTOCOLO DE TESTES ATIVO // ZERO COMPETIÇÃO";
+            position: absolute;
+            top: 0;
+            right: 24px;
+            background: var(--lab-amber);
+            color: #05070b;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 3px 12px;
+            border-radius: 0 0 6px 6px;
+            letter-spacing: 1px;
+        }
+
+        .exp-content h2 {
+            font-family: 'Chakra Petch', sans-serif;
+            color: var(--lab-amber);
+            font-size: 1.65rem;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .exp-content p {
+            color: #e2e8f0;
+            font-size: 0.96rem;
+            margin-bottom: 12px;
+        }
+
+        .exp-content p strong {
+            color: #fff;
+            background: rgba(255, 174, 0, 0.2);
+            padding: 0 5px;
+            border-radius: 4px;
+        }
+
+        .exp-content p strong.cyan-highlight {
+            color: var(--physgun-cyan);
+            background: rgba(0, 229, 255, 0.15);
+        }
+
+        .mutation-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .mutation-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(255, 174, 0, 0.4);
+            color: var(--lab-amber);
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        /* Container da Imagem Meme do Imgur (Semi-transparente) */
+        .exp-meme-wrapper {
+            position: relative;
+            height: 100%;
+            min-height: 220px;
+            border-radius: 12px;
+            border: 1px dashed rgba(255, 174, 0, 0.45);
+            background: rgba(7, 9, 14, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 8px;
+        }
+
+        .exp-meme-img {
+            width: 100%;
+            height: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            /* SEMI-TRANSPARÊNCIA SOLICITADA */
+            opacity: 0.42;
+            filter: contrast(1.1) saturate(1.1);
+            transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
+        }
+
+        .exp-meme-wrapper:hover .exp-meme-img {
+            opacity: 0.88;
+            transform: scale(1.03);
+        }
+
+        .meme-caption {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(0, 0, 0, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        /* =========================================================
+           CARDS DE AVISO EXTRA: NÃO COMPETITIVO & REINÍCIOS CONSTANTES
+           ========================================================= */
+        .lab-notices-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 18px;
+            margin-bottom: 35px;
+        }
+
+        .lab-notice-card {
+            background: rgba(12, 17, 26, 0.92);
+            border: 1px solid var(--border-subtle);
+            border-left: 4px solid var(--physgun-cyan);
+            border-radius: 12px;
+            padding: 18px 20px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+        }
+
+        .lab-notice-card.restart-card {
+            border-left-color: var(--lab-amber);
+        }
+
+        .lab-notice-card h3 {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 1.15rem;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--physgun-cyan);
+        }
+
+        .lab-notice-card.restart-card h3 {
+            color: var(--lab-amber);
+        }
+
+        .lab-notice-card p {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        .lab-notice-card p strong {
+            color: #fff;
+        }
+
+        /* =========================================================
+           REGRA DE OURO (#0) - NÃO SEJA UM FILHO DA PUTA
+           ========================================================= */
+        .golden-rule {
+            background: linear-gradient(135deg, rgba(255, 42, 75, 0.18) 0%, rgba(15, 20, 30, 0.95) 100%);
+            border: 2px solid var(--pvp-red);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 35px;
+            box-shadow: 0 0 30px rgba(255, 42, 75, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .golden-rule-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .rule-zero-badge {
+            background: var(--pvp-red);
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 0.85rem;
+            padding: 5px 12px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .golden-rule h2 {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .golden-rule p {
+            color: #cbd5e1;
+            font-size: 1.02rem;
+        }
+
+        /* =========================================================
+           ABAS DE NAVEGAÇÃO
+           ========================================================= */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .tab-btn.active {
+            background: rgba(0, 229, 255, 0.14);
+            border-color: var(--physgun-cyan);
+            color: var(--physgun-cyan);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+        }
+
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* =========================================================
+           GRID DAS 3 PROIBIÇÕES
+           ========================================================= */
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .rule-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-top: 4px solid var(--pvp-red);
+            border-radius: 14px;
+            padding: 24px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .rule-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.45), 0 0 15px rgba(255, 42, 75, 0.15);
+        }
+
+        .rule-num {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--pvp-red);
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .rule-card h3 {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 1.35rem;
+            margin-bottom: 10px;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        .rule-card p {
+            color: var(--text-muted);
+            font-size: 0.94rem;
+            margin-bottom: 16px;
+        }
+
+        .punishment-tag {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            background: rgba(255, 42, 75, 0.12);
+            border: 1px solid rgba(255, 42, 75, 0.4);
+            color: #ff6b81;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        /* =========================================================
+           COMPARATIVO: LIBERADO VS PROIBIDO
+           ========================================================= */
+        .compare-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .compare-box {
+            background: var(--bg-card);
+            border-radius: 14px;
+            padding: 24px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .compare-box.allowed {
+            border-top: 4px solid var(--allowed-green);
+        }
+
+        .compare-box.forbidden {
+            border-top: 4px solid var(--pvp-red);
+        }
+
+        .compare-box h3 {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 1.35rem;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .compare-box.allowed h3 { color: var(--allowed-green); }
+        .compare-box.forbidden h3 { color: var(--pvp-red); }
+
+        .compare-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .compare-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.95rem;
+            color: #e2e8f0;
+        }
+
+        /* Rodapé */
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            padding-top: 25px;
+            border-top: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        @media (max-width: 780px) {
+            .experiment-banner {
+                grid-template-columns: 1fr;
+            }
+            .exp-meme-wrapper {
+                min-height: 180px;
+            }
+        }
+    </style>
 </head>
-<body class="text-purple-100 antialiased min-h-screen">
+<body>
 
-  <!-- Header -->
-  <header class="relative border-b border-purple-900/50 bg-purple-950/40 backdrop-blur-md sticky top-0 z-50">
-    <div class="max-w-5xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-3 text-center md:text-left">
-        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-pink-500 via-purple-500 to-indigo-500 flex items-center justify-center text-white font-pony text-2xl shadow-lg shadow-purple-500/30">
-          ✨
-        </div>
-        <div>
-          <h1 class="text-2xl font-bold font-pony tracking-wide bg-gradient-to-r from-pink-300 via-purple-200 to-indigo-300 bg-clip-text text-transparent">
-            PonyBuild Brasil
-          </h1>
-          <p class="text-xs font-semibold uppercase tracking-widest text-pink-400/80">Diretrizes do Servidor</p>
-        </div>
-      </div>
-
-      <a href="#observacao" class="text-xs font-semibold bg-purple-900/60 hover:bg-purple-800 border border-purple-700/50 text-pink-300 px-4 py-2 rounded-full transition duration-300 hover:shadow-md hover:shadow-pink-500/20">
-        📌 Observações Finais
-      </a>
+    <div class="hazard-tape"></div>
+    <div class="status-bar">
+        <span class="pulse-dot"></span>
+        <span>LABORATÓRIO NÃO-COMPETITIVO // REINÍCIOS FREQUENTES A QUALQUER HORA PARA ADIÇÃO OU REMOÇÃO DE CONTEÚDO</span>
     </div>
-  </header>
 
-  <div class="max-w-5xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
-
-    <!-- Navegação de Regras -->
-    <aside class="md:col-span-1 space-y-2 hidden md:block sticky top-24 h-fit">
-      <p class="text-xs font-bold uppercase tracking-wider text-purple-400 px-3 mb-3">Índice</p>
-      <nav class="flex flex-col space-y-1 text-sm">
-        <a href="#pilar" class="px-3 py-2 rounded-lg text-pink-300 bg-pink-950/30 border border-pink-500/30 font-semibold transition flex items-center gap-2">🏛️ Nosso Pilar</a>
-        <a href="#r1" class="px-3 py-2 rounded-lg text-purple-300 hover:bg-purple-900/40 hover:text-pink-300 transition flex items-center gap-2">🤝 1. Respeito</a>
-        <a href="#r2" class="px-3 py-2 rounded-lg text-purple-300 hover:bg-purple-900/40 hover:text-pink-300 transition flex items-center gap-2">🧱 2. Construções</a>
-        <a href="#r3" class="px-3 py-2 rounded-lg text-purple-300 hover:bg-purple-900/40 hover:text-pink-300 transition flex items-center gap-2">🔞 3. Conteúdo Adulto</a>
-        <a href="#r4" class="px-3 py-2 rounded-lg text-purple-300 hover:bg-purple-900/40 hover:text-pink-300 transition flex items-center gap-2">🔒 4. Safe Spaces</a>
-        <a href="#r5" class="px-3 py-2 rounded-lg text-purple-300 hover:bg-purple-900/40 hover:text-pink-300 transition flex items-center gap-2">🛡️ 5. Administração</a>
-        <a href="#r6" class="px-3 py-2 rounded-lg text-purple-300 hover:bg-purple-900/40 hover:text-pink-300 transition flex items-center gap-2">🎈 6. Diversos</a>
-      </nav>
-    </aside>
-
-    <!-- Lista Principal -->
-    <main class="md:col-span-3 space-y-6">
-
-      <!-- Apresentação -->
-      <div class="bg-gradient-to-r from-purple-900/30 to-pink-900/20 border border-purple-800/40 rounded-2xl p-6 backdrop-blur-sm">
-        <h2 class="text-xl font-pony text-pink-300 mb-1 flex items-center gap-2">
-          Bem-vindo ao PonyBuild! 🦄
-        </h2>
-        <p class="text-sm text-purple-200/80 leading-relaxed">
-          Aqui a prioridade é construir, trocar uma ideia sem estresse e manter o clima leve. Criamos este guia pra que todo mundo saiba como navegar no servidor numa boa!
-        </p>
-      </div>
-
-      <!-- PILAR PRINCIPAL: O Princípio do Conforto -->
-      <section id="pilar" class="relative bg-gradient-to-br from-pink-950/60 via-purple-950/50 to-indigo-950/60 border-2 border-pink-400/50 rounded-2xl p-6 shadow-xl shadow-pink-950/40">
-        <div class="flex items-center gap-3 mb-3">
-          <span class="text-3xl">🏛️</span>
-          <div>
-            <span class="text-[10px] font-bold uppercase tracking-widest text-pink-400">O Pilar Principal</span>
-            <h2 class="text-2xl font-pony text-pink-200">Princípio do Conforto Coletivo</h2>
-          </div>
-        </div>
-        <p class="text-sm text-purple-100 leading-relaxed">
-          No PonyBuild, a regra de ouro é simples: <strong>o ambiente só tá bom se tiver bom pra todo mundo</strong>. Se uma brincadeira, papo ou cena tá divertida e confortando todo o grupo presente, perfeito, aproveitem! Mas se alguém no espaço se sentir incomodado e expressar isso, o bom senso prevalece e a situação deve parar imediatamente. Se a conversa não resolver, a staff entra pra ajustar as coisas. Resumindo: a liberdade de um não pode anular o conforto do outro.
-        </p>
-      </section>
-
-      <!-- Regra 1 -->
-      <section id="r1" class="group bg-purple-950/30 border border-purple-800/30 hover:border-purple-600/50 rounded-2xl p-6 transition duration-300 hover:shadow-lg hover:shadow-purple-900/20">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="w-10 h-10 rounded-xl bg-purple-900/50 border border-purple-700/50 flex items-center justify-center text-pink-400 font-pony text-lg">1</span>
-          <h2 class="text-xl font-pony text-purple-100 group-hover:text-pink-300 transition">Respeito e Conduta</h2>
-        </div>
-        <ul class="space-y-2 text-sm text-purple-200/90 list-disc list-inside">
-          <li>Trate todo mundo com consideração básica. Não custa nada ser bacana com os outros.</li>
-          <li>Assédio, preconceito e toxicidade real estão completamente fora de questão por aqui.</li>
-          <li>A zueira leve e as piadas estão liberadas, contanto que não passem do ponto e não virem constrangimento.</li>
-        </ul>
-      </section>
-
-      <!-- Regra 2 -->
-      <section id="r2" class="group bg-purple-950/30 border border-purple-800/30 hover:border-purple-600/50 rounded-2xl p-6 transition duration-300 hover:shadow-lg hover:shadow-purple-900/20">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="w-10 h-10 rounded-xl bg-purple-900/50 border border-purple-700/50 flex items-center justify-center text-pink-400 font-pony text-lg">2</span>
-          <h2 class="text-xl font-pony text-purple-100 group-hover:text-pink-300 transition">Construções e Props</h2>
-        </div>
-        <ul class="space-y-2 text-sm text-purple-200/90 list-disc list-inside">
-          <li>Respeite o espaço alheio: não mexa, não delete e não atrapalhe as construções dos outros sem convite.</li>
-          <li>Pegue leve no spam de props pra não derrubar o FPS do mapa ou causar lag nos amiguinhos.</li>
-          <li>O Prop Protection existe por um motivo, respeite os limites das áreas alheias.</li>
-        </ul>
-      </section>
-
-      <!-- Regra 3 (NSFW - Restaurada e com Destaque) -->
-      <section id="r3" class="relative bg-gradient-to-b from-purple-950/50 to-pink-950/30 border-2 border-pink-500/40 rounded-2xl p-6 shadow-lg shadow-pink-950/30 overflow-hidden">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="w-10 h-10 rounded-xl bg-pink-900/50 border border-pink-600/50 flex items-center justify-center text-pink-300 font-pony text-lg">3</span>
-          <h2 class="text-xl font-pony text-pink-200">NSFW e Conteúdo Adulto</h2>
-        </div>
-
-        <div class="space-y-3 text-sm text-purple-200/90">
-          <div class="bg-pink-950/60 border border-pink-500/30 rounded-xl p-3.5 flex items-start gap-3">
-            <span class="text-lg">⚠️</span>
-            <p class="leading-relaxed">
-              Conteúdo de teor adulto (ERP, modelos NSFW, temas sensíveis)
-              <span class="inline-block px-2 py-0.5 mx-1 font-bold text-pink-100 bg-pink-600/60 border border-pink-400/80 rounded-md shadow-sm">
-                NÃO É INCENTIVADO
-              </span> 
-              neste servidor seu estranho!
+    <div class="container">
+        <header>
+            <div class="badge-mode">⚡ G[LABS]</div>
+            <h1>G<span class="pvp"></span> <span class="lab">[LABS]</span></h1>
+            <p class="subtitle">
+                Combate livre, construções malucas, contraptions pesadas, testes de addons e caos controlado. Quase tudo é permitido — apenas pedimos que você siga as únicas regras abaixo.
             </p>
-          </div>
 
-          <ul class="space-y-2 list-disc list-inside pt-1">
-            <li>O mapa aberto e as áreas públicas são mantidos estritamente livres de conteúdo adulto (SFW).</li>
-            <li class="text-pink-300 font-medium">Tentar forçar qualquer situação desagradável gera punição direta.</li>
-          </ul>
+            <div class="ip-bar">
+                <span class="ip-text" id="server-ip">connect seu-ip-aqui:27015</span>
+                <button class="btn-copy" onclick="copyIP()" id="copy-btn">Copiar Console</button>
+            </div>
+        </header>
+
+        <!-- AVISO DE SERVIDOR DE EXPERIMENTOS + IMAGEM DO IMGUR AO LADO -->
+        <section class="experiment-banner">
+            <div class="exp-content">
+                <h2>☣️ AVISO: SERVIDOR DE EXPERIMENTOS</h2>
+                <p>
+                    Esta versão do servidor faz parte de um <strong>laboratório ativo de testes</strong> onde diferentes <strong>playstyles, mecânicas e addons</strong> são colocados à prova constantemente. <strong class="cyan-highlight">O nosso intuito NÃO é competir com outros servidores de nenhuma forma!</strong>
+                </p>
+                <p>
+                    <strong>Não se apegue demais à rotina:</strong> o servidor pode <strong>mudar bruscamente e se descaracterizar rispidamente</strong> ao longo das semanas ou dias. Além disso, mesmo aguentando <strong>muitos props e contraptions pesadas</strong> com folga, o servidor <strong>VAI REINICIAR TODA HORA</strong> para adição ou remoção de conteúdo ao vivo!
+                </p>
+                <div class="mutation-tags">
+                    <span class="mutation-tag">🤝 Zero Competição</span>
+                    <span class="mutation-tag">🔄 Reinícios Toda Hora</span>
+                    <span class="mutation-tag">⚙️ Aguenta Contraptions Pesadas</span>
+                    <span class="mutation-tag">⚠️ Descaracterização Ríspida</span>
+                </div>
+            </div>
+
+            <!-- IMAGEM SEMI-TRANSPARENTE DO IMGUR -->
+            <div class="exp-meme-wrapper">
+                <!-- =========================================================================
+                     TROQUE O LINK ABAIXO PELO LINK DIRETO DO SEU MEME NO IMGUR (ex: https://i.imgur.com/XXXXXXX.png)
+                     A classe .exp-meme-img já deixa ela semi-transparente automaticamente!
+                     ========================================================================= -->
+                <img
+                    src="https://i.imgur.com/8sD5vrc.png"
+                    alt="GmodLabs."
+                    class="exp-meme-img"
+                >
+                <span class="meme-caption">imgur // lab_status.jpg</span>
+            </div>
+        </section>
+
+        <!-- AVISOS DIRETOS: NÃO COMPETIÇÃO + REINÍCIOS E PERFORMANCE -->
+        <div class="lab-notices-grid">
+            <div class="lab-notice-card">
+                <h3>🤝 SEM INTUITO DE COMPETIR</h3>
+                <p>
+                    O <strong>G[LABS]</strong> não existe para disputar jogadores, ranking ou rivalizar com nenhum outro servidor de GMod. Isto aqui é um projeto puramente experimental e independente para testar ideias malucas, brincar com mecânicas e ver o que funciona.
+                </p>
+            </div>
+            <div class="lab-notice-card restart-card">
+                <h3>🔄 VAI REINICIAR TODA HORA (SALVE SUAS COISAS!)</h3>
+                <p>
+                    O servidor tem força bruta e <strong>aguenta muitos props e contraptions pesadas tranquilamente</strong>. Quando ele reiniciar do nada, <strong>não é queda por lag</strong>: é simplesmente adição, atualização ou remoção de addons em tempo real. Use sempre o <em>Adv Duplicator 2</em>!
+                </p>
+            </div>
         </div>
-      </section>
 
-      <!-- Regra 4 -->
-      <section id="r4" class="group bg-purple-950/30 border border-purple-800/30 hover:border-purple-600/50 rounded-2xl p-6 transition duration-300 hover:shadow-lg hover:shadow-purple-900/20">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="w-10 h-10 rounded-xl bg-purple-900/50 border border-purple-700/50 flex items-center justify-center text-pink-400 font-pony text-lg">4</span>
-          <h2 class="text-xl font-pony text-purple-100 group-hover:text-pink-300 transition">Safe Spaces</h2>
+        <!-- REGRA DE OURO #0 -->
+        <section class="golden-rule">
+            <div class="golden-rule-header">
+                <span class="rule-zero-badge">REGRA #0 // LEI SUPREMA</span>
+                <h2>"NÃO SEJA UM FILHO DA PUTA"</h2>
+            </div>
+            <p>
+                O servidor tem liberdade quase total para PvP, bases, engenhocas pesadas e testes de addons, mas <strong>não abuse da boa vontade</strong>. O servidor aguenta bastante tranco de física, mas não crie máquinas especificamente feitas para gerar lag/crash e derrubar a sessão, não tente explorar brechas para estragar a experiência de todo mundo e tenha o mínimo de bom senso. Se você agir exclusivamente para foder o servidor, vai rodar.
+            </p>
+        </section>
+
+        <!-- NAVEGAÇÃO POR ABAS -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab('proibicoes', this)">🚫 As 3 Únicas Proibições</button>
+            <button class="tab-btn" onclick="openTab('comparativo', this)">✅ O que Pode vs. Não Pode</button>
+            <button class="tab-btn" onclick="openTab('mutacoes', this)">🧪 Como Funcionam os Testes</button>
         </div>
-        <ul class="space-y-2 text-sm text-purple-200/90 list-disc list-inside">
-          <li>Safe Spaces são locais privados. O dono define as regras de entrada e permanência.</li>
-          <li>Não force entrada nem tente xeretar o espaço dos outros sem autorização prévia.</li>
-          <li>A responsabilidade pelo que acontece dentro de um espaço privado é totalmente dos participantes.</li>
-        </ul>
-      </section>
 
-      <!-- Regra 5 -->
-      <section id="r5" class="group bg-purple-950/30 border border-purple-800/30 hover:border-purple-600/50 rounded-2xl p-6 transition duration-300 hover:shadow-lg hover:shadow-purple-900/20">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="w-10 h-10 rounded-xl bg-purple-900/50 border border-purple-700/50 flex items-center justify-center text-pink-400 font-pony text-lg">5</span>
-          <h2 class="text-xl font-pony text-purple-100 group-hover:text-pink-300 transition">Administração</h2>
+        <!-- ABA 1: AS 3 PROIBIÇÕES -->
+        <div id="proibicoes" class="tab-panel active">
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <span class="rule-num">PROIBIÇÃO #01 // FÍSICA</span>
+                    <h3>Sem Prop Push ou Prop Kill</h3>
+                    <p>
+                        O PvP é na bala, explosivo, veículo e engenhoca legítima. É estritamente proibido usar a Physgun ou aceleradores para arremessar props na cara dos outros para matar ou empurrar jogadores pelo mapa.
+                    </p>
+                    <span class="punishment-tag">Punição: Aviso / Kick / Ban Temporário</span>
+                </div>
+
+                <div class="rule-card">
+                    <span class="rule-num">PROIBIÇÃO #02 // AUTOMAÇÃO</span>
+                    <h3>Sem Wiremod / Starfall de Spawnkill</h3>
+                    <p>
+                        Wiremod e Starfall são bem-vindos para criar máquinas, radares, veículos e armas criativas. Porém, usar E2, chips ou torretas automatizadas para fazer <strong>spawnkill</strong> ou matar instantaneamente quem acabou de nascer dá ban na hora.
+                    </p>
+                    <span class="punishment-tag">Punição: Limpeza de Props + Ban</span>
+                </div>
+
+                <div class="rule-card">
+                    <span class="rule-num">PROIBIÇÃO #03 // CONVIVÊNCIA</span>
+                    <h3>Zero Preconceito</h3>
+                    <p>
+                        Xingamento normal de trocação de tiro faz parte do PvP, mas <strong>racismo, homofobia, nazismo, xenofobia ou qualquer tipo de preconceito</strong> no chat de voz, texto ou em placas/decals não tem segunda chance.
+                    </p>
+                    <span class="punishment-tag">Punição: Ban Permanente Direto</span>
+                </div>
+            </div>
         </div>
-        <ul class="space-y-2 text-sm text-purple-200/90 list-disc list-inside">
-          <li>A palavra da staff busca manter a ordem para todos. As decisões tomadas devem ser respeitadas.</li>
-          <li>Usar contas secundárias ou tentar driblar punições só vai resultar em banimento definitivo.</li>
-          <li>Se teve algum problema ou discordou de algo, troque uma ideia tranquila com a gente no Discord.</li>
-        </ul>
-      </section>
 
-      <!-- Regra 6 -->
-      <section id="r6" class="group bg-purple-950/30 border border-purple-800/30 hover:border-purple-600/50 rounded-2xl p-6 transition duration-300 hover:shadow-lg hover:shadow-purple-900/20">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="w-10 h-10 rounded-xl bg-purple-900/50 border border-purple-700/50 flex items-center justify-center text-pink-400 font-pony text-lg">6</span>
-          <h2 class="text-xl font-pony text-purple-100 group-hover:text-pink-300 transition">Diversos</h2>
+        <!-- ABA 2: O QUE PODE VS NÃO PODE -->
+        <div id="comparativo" class="tab-panel">
+            <div class="compare-grid">
+                <div class="compare-box allowed">
+                    <h3>✅ 100% LIBERADO</h3>
+                    <ul class="compare-list">
+                        <li><span>🔫</span> <div><strong>Matar geral (RDM não existe aqui):</strong> É Sandbox PvP Deathmatch. Viu alguém moscando? Pode meter bala sem pedir permissão.</div></li>
+                        <li><span>🏗️</span> <div><strong>Muitos Props e Contraptions Pesadas:</strong> O servidor aguenta construções grandes, carros complexos, tanques e bases robustas sem frescura.</div></li>
+                        <li><span>🤖</span> <div><strong>Wiremod e Starfall criativos:</strong> Mechas, sistemas de defesa de base, computadores, música e engenhocas de combate justas.</div></li>
+                        <li><span>🧪</span> <div><strong>Testar os addons malucos da semana:</strong> Aproveite qualquer mecânica experimental que estiver ativa hoje.</div></li>
+                    </ul>
+                </div>
+
+                <div class="compare-box forbidden">
+                    <h3>❌ ESTRITAMENTE PROIBIDO</h3>
+                    <ul class="compare-list">
+                        <li><span>📦</span> <div><strong>Prop Push / Prop Kill / Prop Block em Spawn:</strong> Usar props com a Physgun como arma ou trancar o ponto de nascimento.</div></li>
+                        <li><span>⚡</span> <div><strong>Spawnkill automatizado (Wire/Starfall):</strong> Mirar chips, lasers ou explosivos automáticos nos pontos de respawn.</div></li>
+                        <li><span>🔥</span> <div><strong>Exploits de Crash / Lag Intencional:</strong> Criar colisões bugadas com o único intuito de travar o servidor (Regra #0).</div></li>
+                        <li><span>🚫</span> <div><strong>Qualquer crime de ódio/preconceito:</strong> Ban permanente sem choro.</div></li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <ul class="space-y-2 text-sm text-purple-200/90 list-disc list-inside">
-          <li>Nada de abusar de bugs do jogo ou de addons pra tirar vantagem ou avacalhar o mapa.</li>
-          <li>O servidor é um lugar de hangout. O objetivo é relaxar, então colabore com a atmosfera geral.</li>
-          <li>Na dúvida sobre qualquer atitude, chama um staff no chat e pergunta antes de fazer.</li>
-        </ul>
-      </section>
 
-      <!-- Observação Final -->
-      <div id="observacao" class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-6 text-amber-200 text-sm shadow-md">
-        <div class="flex items-center gap-2 text-amber-400 font-bold mb-2">
-          <span>📜</span>
-          <span>Observação Importante</span>
+        <!-- ABA 3: COMO FUNCIONAM OS TESTES -->
+        <div id="mutacoes" class="tab-panel">
+            <div class="compare-box" style="border-top: 4px solid var(--lab-amber);">
+                <h3 style="color: var(--lab-amber);">🧪 POR QUE O SERVIDOR MUDA E REINICIA TANTO?</h3>
+                <p style="color: #e2e8f0; margin-bottom: 14px;">
+                    O <strong>G[LABS]</strong> não tem pretensão alguma de competir com servidores tradicionais ou comerciais. Ele funciona como uma bancada de testes viva onde testamos ativamente novos pacotes de armas, veículos, físicas alternativas e estilos de jogo.
+                </p>
+                <ul class="compare-list">
+                    <li><span>🔄</span> <div><strong>Reinícios a Qualquer Hora:</strong> Mesmo suportando muitos props e contraptions pesadas com estabilidade, o servidor <strong>vai reiniciar várias vezes ao dia</strong> sempre que precisarmos injetar, configurar ou remover conteúdo.</div></li>
+                    <li><span>⚠️</span> <div><strong>Mudanças Ríspidas e Descaracterização:</strong> Um dia o servidor pode estar focado em tiroteio tático acelerado; na outra semana ou dia, pode virar guerra de veículos, caos aéreo ou combate medieval com explosivos.</div></li>
+                    <li><span>🗑️</span> <div><strong>Addons Vêm e Vão:</strong> Se um addon quebrar algo ou for chato, ele é removido na hora. Se for divertido, fica para mais testes.</div></li>
+                    <li><span>💾</span> <div><strong>Salve suas Duplications:</strong> Como os reinícios para troca de conteúdo acontecem toda hora, salve constantemente suas contraptions no <em>Adv Duplicator 2</em>!</div></li>
+                </ul>
+            </div>
         </div>
-        <p class="text-amber-200/80 leading-relaxed">
-          Estas regras existem simplesmente pra garantir que o PonyBuild continue um lugar gostoso de jogar. A administração se reserva o direito de agir em casos que afetem o bem-estar do servidor, mesmo que a situação específica não esteja detalhada palavra por palavra aqui.
-        </p>
-      </div>
 
-    </main>
-  </div>
+        <footer>
+            G[LABS] // LABORATÓRIO EXPERIMENTAL NÃO-COMPETITIVO // HOSPEDADO VIA GITHUB PAGES
+        </footer>
+    </div>
 
-  <footer class="text-center py-8 border-t border-purple-900/40 text-purple-400/60 text-xs">
-    <p>🐴 <strong>PonyBuild Brasil</strong> — Servidor Garry's Mod</p>
-  </footer>
+    <script>
+        // Altere aqui para o IP real do seu servidor
+        const SERVER_CONNECT_CMD = "connect seu-ip-aqui:27015";
+        document.getElementById("server-ip").textContent = SERVER_CONNECT_CMD;
 
+        function copyIP() {
+            navigator.clipboard.writeText(SERVER_CONNECT_CMD).then(() => {
+                const btn = document.getElementById("copy-btn");
+                const originalText = btn.textContent;
+                btn.textContent = "Copiado!";
+                btn.style.background = "#00ff88";
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = "";
+                }, 2000);
+            });
+        }
+
+        function openTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+    </script>
 </body>
 </html>
